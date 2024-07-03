@@ -3,8 +3,8 @@ const bcrypt = require("bcryptjs");
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
 const isAuth = require("./../middleware/isAuthenticated");
-const SECRET_KEY = "your_jwt_secret_key"; // You should store this in an environment variable
-
+ // You should store this in an environment variable
+const SALT = 12
 // Signup Route
 router.post("/signup", async (req, res, next) => {
   try {

@@ -14,7 +14,7 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/auth", require("./Routes/auth.routes"));
-app.use("/auth",require("./Routes/workouts.routes"))
+app.use("/workout", require("./Routes/workouts.routes"));
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "views", "index.html"));

@@ -8,9 +8,9 @@ async function isAuth(req, res, next) {
       return res.status(400).json({ message: "No token found in the headers" });
     }
     token = token.split(" ")[1];
-    console.log(token);
+
     const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
-    console.log(decoded);
+
     //! most important line of code here
     req.userId = decoded.id;
     next();

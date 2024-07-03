@@ -2,6 +2,11 @@ const { Schema, model } = require("mongoose");
 
 const workoutSchema = new Schema(
   {
+    creator: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      // required: true,
+    },
     title: {
       type: String,
       require: true,
@@ -9,17 +14,22 @@ const workoutSchema = new Schema(
     sets: {
       type: Number,
       min: 1,
+      default: 1,
       require: true,
     },
     reps: {
       type: Number,
       min: 1,
+      default: 1,
       require: true,
     },
-    creator: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+    caloriesBurned: {
+      type: Number,
+      min: 1,
+    },
+    date: {
+      type: Date,
+      default: Date.now,
     },
   },
   { timestamps: true }

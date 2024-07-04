@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 const User= require("./../models/user.model")
 const API_NINJAS_KEY = "FRkT0SVi6Nq93HepoRjtYA==LWV7tpkNwsy6oT2l";
 
-router.get("/:id/list", isAuth, async (req, res, next) => {
+router.get("/:id/workoutlist", isAuth, async (req, res, next) => {
   try {
     const {id}=req.params
     const findUser= await User.findOne({_id:id})
@@ -45,15 +45,25 @@ router.post("/:id/create", isAuth, async (req, res, next) => {
   }
 });
 
-router.get("/:id", isAuth, async (req, res, next) => {
-  const { id } = req.params;
-
-  const userWorkout = await Workout.find({ creator: id }).populate("creator");
-  console.log(userWorkout);
-  res.json({ workout: userWorkout });
+router.get("/", isAuth, async (req, res, next) => {
   try {
+    const { id } = req.params;
+    const userWorkout = await Workout.find({ creator: id }).populate("creator");
+    console.log(userWorkout);
+    res.json({ workout: userWorkout });
   } catch (error) {
     console.log(error);
   }
 });
+
+router.delete("/list/:id",isAuth,async(req,res,next)=>{
+  try {
+    const {id}= req.params
+    const userWorkout=await Workout.findOneAndDelete({_id:id})
+    res.json({message:"deleted"})
+  } catch (error) {
+    console.log(error)
+  }
+})
+
 module.exports = router;

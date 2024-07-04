@@ -25,6 +25,11 @@ const userSchema = new Schema({
     type: Number,
     require: true,
   },
+  gender:{
+    type:String,
+    enum: ["male","female","other"],
+    require:true,
+  },
   weight: {
     type: Number,
     require: true,

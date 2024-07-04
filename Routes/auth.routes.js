@@ -81,7 +81,8 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
-router.get("/dashboard", isAuth, async (req, res, next) => {
+router.get("/dashboard",isAuth
+  , async (req, res, next) => {
   try {
     const userID = req.userId;
     console.log(userID);
@@ -96,6 +97,7 @@ router.get("/dashboard", isAuth, async (req, res, next) => {
 
     const startDay = new Date(
       currentDateFormatted.getFullYear(),
+      
       currentDateFormatted.getMonth(),
       currentDateFormatted.getDate()
     );
@@ -107,19 +109,34 @@ router.get("/dashboard", isAuth, async (req, res, next) => {
     );
 
     const totalCalories = await Workout.aggregate([
-      { $match: { creator: user._id, date: { $gte: startDay, $lte: endDay } } },
-      { $group: { _id: null, totalCaloriesBurnt: { $sum: "$caloriesBurned" } } }
+      { $match: { creator: user._id, date: { $gte: startDay, $lt: endDay } } },
+      { $group: { _id: null, totalCaloriesBurnt: { $sum: "$caloriesBurned" } ,workoutList:{$push:"$title"}} }
     ]);
-
-    const totalCaloriesBurnt = totalCalories.length > 0 ? totalCalories[0].totalCaloriesBurnt : 0;
+  
     
+    const totalCaloriesBurnt = totalCalories.length > 0 ? totalCalories[0].totalCaloriesBurnt : 0;
+    const workoutList= totalCalories.length>0 ? totalCalories[0].workoutList:[]
+
     const totalWorkouts= await Workout.countDocuments({creator:userID,date:{$gte:startDay,$lt:endDay}})
     console.log(totalWorkouts,totalCaloriesBurnt)
-    res.json({ totalWorkouts , totalCaloriesBurnt});
+    res.json({ user, totalCaloriesBurnt, totalWorkouts, workoutList});
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "An error occurred" });
   }
 });
+
+router.delete("/dashboard",isAuth,async(req,res,next)=>{
+  try {
+    console.log(req.userId)
+    const deleteUser= await User.findOneAndDelete({creator:req.userId})
+    const foundUser=await User.find({_id:req.userId})
+    if(!foundUser){
+      await Workout.findOneAndDelete({creator:req.userId})
+    }
+    res.json({message:"deleted"})
+  } catch (error) {
+    
+  }
+})
 
 module.exports = router;

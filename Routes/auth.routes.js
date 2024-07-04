@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
 const isAuth = require("./../middleware/isAuthenticated");
+const Workout = require("./../models/workout.model")
  // You should store this in an environment variable
 const SALT = 12
 // Signup Route
@@ -80,12 +81,44 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
-router.get("/verify", isAuth, async (req, res, next) => {
+router.get("/dashboard", isAuth, async (req, res, next) => {
   try {
-    const user = await User.findById(req.userId);
-    res.json(user);
+    const userID = req.userId;
+    console.log(userID);
+    const user = await User.findById(userID);
+
+    if (!user) {
+      return res.status(404).json({ message: "user not found" });
+    }
+
+    const currentDateFormatted = new Date();
+    console.log(currentDateFormatted);
+
+    const startDay = new Date(
+      currentDateFormatted.getFullYear(),
+      currentDateFormatted.getMonth(),
+      currentDateFormatted.getDate()
+    );
+
+    const endDay = new Date(
+      currentDateFormatted.getFullYear(),
+      currentDateFormatted.getMonth(),
+      currentDateFormatted.getDate() + 1
+    );
+
+    const totalCalories = await Workout.aggregate([
+      { $match: { creator: user._id, date: { $gte: startDay, $lte: endDay } } },
+      { $group: { _id: null, totalCaloriesBurnt: { $sum: "$caloriesBurned" } } }
+    ]);
+
+    const totalCaloriesBurnt = totalCalories.length > 0 ? totalCalories[0].totalCaloriesBurnt : 0;
+    
+    const totalWorkouts= await Workout.countDocuments({creator:userID,date:{$gte:startDay,$lt:endDay}})
+    console.log(totalWorkouts,totalCaloriesBurnt)
+    res.json({ totalWorkouts , totalCaloriesBurnt});
   } catch (error) {
     console.log(error);
+    res.status(500).json({ message: "An error occurred" });
   }
 });
 

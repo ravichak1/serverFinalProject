@@ -125,6 +125,17 @@ router.get("/dashboard",isAuth
   }
 });
 
+router.put("/dashboard",isAuth, async(req,res,next)=>{
+  try {
+    const userID = req.userId
+    const {weight, height, age} = req.body
+    const updateUser = await User.findOneAndUpdate({_id:userID},{weight,height,age},{new:true})
+    res.json(updateUser)
+  } catch (error) {
+    console.log(error)
+  }
+})
+
 router.delete("/dashboard",isAuth,async(req,res,next)=>{
   try {
     console.log(req.userId)

@@ -23,7 +23,7 @@ router.get("/:id/workoutlist", isAuth, async (req, res, next) => {
   }
 });
 
-router.post("/:id/create", isAuth, async (req, res, next) => {
+router.post("/create", isAuth, async (req, res, next) => {
   try {
     const { title, sets, reps, caloriesBurned } = req.body;
     const { id } = req.params;
@@ -55,6 +55,18 @@ router.get("/", isAuth, async (req, res, next) => {
     console.log(error);
   }
 });
+
+router.put("/list/:id",isAuth,async(req,res,next)=>{
+  try {
+    const {id}= req.params
+    const {sets, reps,caloriesBurned,title}= req.body
+    const workoutUpdate= await Workout.findOneAndUpdate({_id:id},{sets,reps,caloriesBurned,title},{new:true})
+
+    res.json(workoutUpdate)
+  } catch (error) {
+    
+  }
+})
 
 router.delete("/list/:id",isAuth,async(req,res,next)=>{
   try {
